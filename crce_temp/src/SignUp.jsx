@@ -17,9 +17,9 @@ const SignUp = () => {
       const response = await axios.post('http://localhost:3000/api/signup', {
         username,
         password,
-        role,
-        email_id: emailId,
-        team_id: role === 'team_leader' || role === 'player' ? teamId : null
+       
+        email_id: emailId
+      
       });
       setMessage(response.data.message);
     } catch (error) {
@@ -32,21 +32,7 @@ const SignUp = () => {
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2">Role:</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-              className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
-            >
-              <option value="">Select a role</option>
-              <option value="judge">Judge</option>
-              <option value="admin">Admin</option>
-              <option value="team_leader">Team Leader</option>
-              <option value="player">Player</option>
-            </select>
-          </div>
+         
 
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2">Username:</label>
@@ -70,18 +56,6 @@ const SignUp = () => {
             />
           </div>
 
-          {role === 'team_leader' || role === 'player' ? (
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Team ID:</label>
-              <input
-                type="text"
-                value={teamId}
-                onChange={(e) => setTeamId(e.target.value)}
-                required
-                className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-          ) : null}
 
           <div className="mb-6">
             <label className="block text-gray-700 font-bold mb-2">Password:</label>

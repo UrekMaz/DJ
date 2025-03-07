@@ -8,11 +8,6 @@ const userDataSchema = new mongoose.Schema({
         unique: true,
         trim: true
     },
-    team_id: {
-        type: String, // No longer a reference, just a simple String
-        required: false, // Only necessary for roles that need a team association
-        trim: true
-    },
     email_id: {
         type: String,
         required: true,
@@ -22,11 +17,6 @@ const userDataSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
-    },
-    role: {
-        type: String,
-        enum: ['judge', 'admin', 'team_leader', 'player'],
         required: true
     }
 }, {
