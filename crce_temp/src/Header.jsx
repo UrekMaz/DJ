@@ -1,38 +1,272 @@
-import {Link} from "react-router-dom";
-import {useContext} from "react";
+// Header.jsx
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { 
+  FaWarehouse, 
+  FaBoxOpen, 
+  FaChartLine, 
+  FaUsers, 
+  FaTruck, 
+  FaCog, 
+  FaSignOutAlt,
+  FaBell,
+  FaUserCircle,
+  FaBars,
+  FaTimes
+} from 'react-icons/fa';
 
-export default function Header() {
+const Header = () => {
+  const [user, setUser] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const location = useLocation();
+  
+  // Mock notifications for demo
+  const notifications = [
+    { id: 1, text: 'Low stock alert: Printer Paper', time: '10 minutes ago', unread: true },
+    { id: 2, text: 'New shipment arrived', time: '2 hours ago', unread: true },
+    { id: 3, text: 'Monthly inventory report ready', time: 'Yesterday', unread: false },
+  ];
+
+  useEffect(() => {
+    // Fetch user data from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+    // Close other menus if open
+    if (!mobileMenuOpen) {
+      setNotificationsOpen(false);
+      setUserMenuOpen(false);
+    }
+  };
+
+  const toggleNotifications = () => {
+    setNotificationsOpen(!notificationsOpen);
+    setUserMenuOpen(false);
+  };
+
+  const toggleUserMenu = () => {
+    setUserMenuOpen(!userMenuOpen);
+    setNotificationsOpen(false);
+  };
+
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
   return (
-    <header className="flex justify-between">
-      <Link to={'/'} className="flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 -rotate-90">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-        </svg>
-        <span className="font-bold text-xl">airbnb</span>
-      </Link>
-      <div className="flex gap-2 border border-gray-300 rounded-full py-2 px-4 shadow-md shadow-gray-300">
-        <div>Anywhere</div>
-        <div className="border-l border-gray-300"></div>
-        <div>Any week</div>
-        <div className="border-l border-gray-300"></div>
-        <div>Add guests</div>
-        <button className="bg-primary text-white p-1 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-          </svg>
-        </button>
-      </div>
-      <div className="flex items-center gap-2 border border-gray-300 rounded-full py-2 px-4 ">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-        </svg>
-        <div className="bg-gray-500 text-white rounded-full border border-gray-500 overflow-hidden">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 relative top-1">
-            <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
-          </svg>
+    <header className="bg-white shadow-md">
+      {/* Main header container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          {/* Logo and brand section */}
+          <div className="flex items-center">
+            <Link to="/dashboard" className="flex items-center">
+              <div className="bg-blue-600 h-8 w-8 flex items-center justify-center rounded-md mr-2">
+                <FaWarehouse className="text-white text-lg" />
+              </div>
+              <span className="text-xl font-bold text-gray-800">InventoryPro</span>
+            </Link>
+          </div>
+
+          {/* Desktop navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            <NavItem to="/dashboard" icon={<FaChartLine />} text="Dashboard" active={isActive('/dashboard')} />
+            <NavItem to="/inventory" icon={<FaBoxOpen />} text="Inventory" active={isActive('/inventory')} />
+            <NavItem to="/suppliers" icon={<FaTruck />} text="Suppliers" active={isActive('/suppliers')} />
+            <NavItem to="/users" icon={<FaUsers />} text="Users" active={isActive('/users')} />
+            <NavItem to="/settings" icon={<FaCog />} text="Settings" active={isActive('/settings')} />
+          </div>
+
+          {/* User section (notifications, profile) */}
+          <div className="hidden md:flex items-center space-x-4">
+            {/* Notifications */}
+            <div className="relative">
+              <button 
+                onClick={toggleNotifications}
+                className="p-1 rounded-full text-gray-600 hover:text-blue-600 focus:outline-none"
+              >
+                <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+                <FaBell className="h-6 w-6" />
+              </button>
+
+              {/* Notifications dropdown */}
+              {notificationsOpen && (
+                <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                  <div className="py-2 px-4 bg-blue-600 text-white rounded-t-md flex justify-between items-center">
+                    <h3 className="text-sm font-medium">Notifications</h3>
+                    <span className="text-xs bg-white text-blue-600 px-2 py-1 rounded-full">
+                      {notifications.filter(n => n.unread).length} new
+                    </span>
+                  </div>
+                  <div className="py-1 max-h-96 overflow-y-auto" role="menu" aria-orientation="vertical">
+                    {notifications.map(notification => (
+                      <div 
+                        key={notification.id} 
+                        className={`px-4 py-3 hover:bg-gray-50 border-b border-gray-100 ${notification.unread ? 'bg-blue-50' : ''}`}
+                      >
+                        <p className="text-sm text-gray-700">{notification.text}</p>
+                        <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                      </div>
+                    ))}
+                    {notifications.length === 0 && (
+                      <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                        No notifications
+                      </div>
+                    )}
+                  </div>
+                  <div className="py-1 border-t border-gray-100">
+                    <Link to="/notifications" className="block px-4 py-2 text-sm text-center text-blue-600 hover:bg-gray-50">
+                      View all notifications
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* User profile */}
+            <div className="relative">
+              <button 
+                onClick={toggleUserMenu}
+                className="flex items-center text-gray-700 hover:text-blue-600 focus:outline-none"
+              >
+                <FaUserCircle className="h-8 w-8 mr-1 text-gray-500" />
+                <span className="text-sm font-medium">{user?.fullName || 'User'}</span>
+              </button>
+
+              {/* User dropdown */}
+              {userMenuOpen && (
+                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                  <div className="py-1" role="menu" aria-orientation="vertical">
+                    <div className="px-4 py-2 text-xs text-gray-500">
+                      Logged in as
+                      <p className="font-medium text-gray-700">{user?.username || 'username'}</p>
+                      <p className="text-xs text-blue-600 bg-blue-50 rounded px-2 py-1 mt-1 inline-block">
+                        {user?.role || 'role'}
+                      </p>
+                    </div>
+                    <div className="border-t border-gray-100"></div>
+                    <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
+                      <FaUserCircle className="mr-2 text-gray-500" /> Profile
+                    </Link>
+                    <Link to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
+                      <FaCog className="mr-2 text-gray-500" /> Settings
+                    </Link>
+                    <div className="border-t border-gray-100"></div>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
+                    >
+                      <FaSignOutAlt className="mr-2" /> Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="flex md:hidden items-center">
+            <button
+              onClick={toggleMobileMenu}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 focus:outline-none"
+            >
+              {mobileMenuOpen ? (
+                <FaTimes className="h-6 w-6" />
+              ) : (
+                <FaBars className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
-        
       </div>
+
+      {/* Mobile menu, show/hide based on menu state */}
+      {mobileMenuOpen && (
+        <div className="md:hidden">
+          <div className="pt-2 pb-3 space-y-1">
+            <MobileNavItem to="/dashboard" icon={<FaChartLine />} text="Dashboard" active={isActive('/dashboard')} />
+            <MobileNavItem to="/inventory" icon={<FaBoxOpen />} text="Inventory" active={isActive('/inventory')} />
+            <MobileNavItem to="/suppliers" icon={<FaTruck />} text="Suppliers" active={isActive('/suppliers')} />
+            <MobileNavItem to="/users" icon={<FaUsers />} text="Users" active={isActive('/users')} />
+            <MobileNavItem to="/settings" icon={<FaCog />} text="Settings" active={isActive('/settings')} />
+          </div>
+          <div className="pt-4 pb-3 border-t border-gray-200">
+            <div className="flex items-center px-4">
+              <div className="flex-shrink-0">
+                <FaUserCircle className="h-10 w-10 text-gray-500" />
+              </div>
+              <div className="ml-3">
+                <div className="text-base font-medium text-gray-800">{user?.fullName || 'User'}</div>
+                <div className="text-sm font-medium text-gray-500">{user?.email || 'email@example.com'}</div>
+              </div>
+              <div className="ml-auto flex items-center space-x-4">
+                <button className="p-1 rounded-full text-gray-600 hover:text-blue-600 focus:outline-none">
+                  <FaBell className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            <div className="mt-3 space-y-1">
+              <Link 
+                to="/profile"
+                className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Profile
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-4 py-2 text-base font-medium text-red-600 hover:bg-red-50"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
-}
+};
+
+// Desktop Navigation Item Component
+const NavItem = ({ to, icon, text, active }) => (
+  <Link
+    to={to}
+    className={`px-3 py-2 rounded-md text-sm font-medium flex items-center ${
+      active
+        ? 'bg-blue-600 text-white'
+        : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+    }`}
+  >
+    <span className="mr-2">{icon}</span>
+    {text}
+  </Link>
+);
+
+// Mobile Navigation Item Component
+const MobileNavItem = ({ to, icon, text, active }) => (
+  <Link
+    to={to}
+    className={`block px-4 py-2 text-base font-medium flex items-center ${
+      active
+        ? 'bg-blue-600 text-white'
+        : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+    }`}
+  >
+    <span className="mr-3">{icon}</span>
+    {text}
+  </Link>
+);
+
+export default Header;
