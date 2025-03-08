@@ -7,6 +7,7 @@ import IndexPage from './IndexPage';
 import SignUp from './SignUp';
 import Login from './Login';
 import {Route, Routes} from "react-router-dom";
+import TableauDashboard from './TableauDashboard';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route index element={<IndexPage />} />
            <Route path="/login" element={<Login/>} />
            <Route path="/signup" element={<SignUp/>} />
+          <Route path="/tableau" element={<TableauDashboard />} />
           <Route path="/streamlit" element={<StreamlitEmbed />} />
           <Route path="/pay" element={<RazorpayPayment />} />
         </Route>
